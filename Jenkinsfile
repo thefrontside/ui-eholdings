@@ -5,7 +5,7 @@ buildNPM {
   runLint = true
   runSonarqube = true
   runScripts = [
-     'test':'--karma.singleRun --karma.browsers ChromeDocker --karma.reporters mocha junit --coverage',
-     'test':'--karma.singleRun --karma.browsers Firefox --karma.reporters mocha junit --coverage'
+     ['test':'--karma.singleRun --karma.browsers ChromeDocker --karma.reporters mocha junit --coverage'],
+     ['test':'--karma.singleRun --karma.browsers Firefox --karma.reporters mocha junit --coverage']
   ]
 }
