@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   UPDATE_CUSTOM_LABELS,
@@ -9,17 +12,22 @@ import {
   updateCustomLabelsSuccess,
 } from '../actions';
 
+
 export default ({ customLabelsApi }) => (action$, store) => {
   return action$
-    .filter(action => action.type === UPDATE_CUSTOM_LABELS)
-    .mergeMap(action => {
-      const {
-        payload: { customLabels, credentialId },
-      } = action;
+    .pipe(
+      filter(action => action.type === UPDATE_CUSTOM_LABELS),
+      mergeMap(action => {
+        const {
+          payload: { customLabels, credentialId },
+        } = action;
 
-      return customLabelsApi
-        .updateCustomLabels(store.getState().okapi, customLabels, credentialId)
-        .map(updateCustomLabelsSuccess)
-        .catch(errors => Observable.of(updateCustomLabelsFailure({ errors })));
-    });
+        return customLabelsApi
+          .updateCustomLabels(store.getState().okapi, customLabels, credentialId)
+          .pipe(
+            map(updateCustomLabelsSuccess),
+            catchError(errors => of(updateCustomLabelsFailure({ errors })))
+          );
+      }),
+    );
 };

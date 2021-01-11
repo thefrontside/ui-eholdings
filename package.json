@@ -44,7 +44,7 @@
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^2.5.0",
     "redux": "^3.0.0",
-    "rxjs": "^5.0.0",
+    "rxjs": "^6.6.3",
     "sinon": "^6.3.5",
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0",
@@ -67,7 +67,7 @@
     "react-measure": "^2.1.0",
     "react-router-prop-types": "^1.0.4",
     "redux-actions": "^2.2.1",
-    "redux-observable": "^0.15.0"
+    "redux-observable": "^1.2.0"
   },
   "peerDependencies": {
     "@folio/stripes": "^5.0.0",

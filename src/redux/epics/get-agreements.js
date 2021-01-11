@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   GET_AGREEMENTS,
@@ -11,17 +14,21 @@ import {
 
 export default ({ agreementsApi }) => (action$, store) => {
   return action$
-    .filter(action => action.type === GET_AGREEMENTS)
-    .mergeMap(action => {
-      const {
-        payload: {
-          refId,
-        },
-      } = action;
+    .pipe(
+      filter(action => action.type === GET_AGREEMENTS),
+      mergeMap(action => {
+        const {
+          payload: {
+            refId,
+          },
+        } = action;
 
-      return agreementsApi
-        .getAll(store.getState().okapi, refId)
-        .map(response => getAgreementsSuccess(response))
-        .catch(errors => Observable.of(getAgreementsFailure({ errors })));
-    });
+        return agreementsApi
+          .getAll(store.getState().okapi, refId)
+          .pipe(
+            map(response => getAgreementsSuccess(response)),
+            catchError(errors => of(getAgreementsFailure({ errors }))),
+          );
+      }),
+    );
 };

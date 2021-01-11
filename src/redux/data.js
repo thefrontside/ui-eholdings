@@ -1,8 +1,5 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { from, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import get from 'lodash/get';
 
 import { qs } from '../components/utilities';
@@ -535,8 +532,9 @@ export function epic(action$, { getState }) {
           : Promise.reject({ errors: responseBody.errors, status }))); // eslint-disable-line prefer-promise-reject-errors
 
       // an observable from resolving or rejecting the request payload
-      return Observable.from(promise)
-        .map(({ status, responseBody }) => resolve(request, responseBody, payload, status))
-        .catch(({ errors, status }) => Observable.of(reject(request, errors, data, status)));
+      return from(promise).pipe(
+        map(({ status, responseBody }) => resolve(request, responseBody, payload, status)),
+        catchError(({ errors, status }) => of(reject(request, errors, data, status))),
+      );
     });
 }

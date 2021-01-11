@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   GET_KB_CREDENTIALS,
@@ -11,9 +14,13 @@ import {
 
 export default ({ knowledgeBaseApi }) => (action$, store) => {
   return action$
-    .filter(action => action.type === GET_KB_CREDENTIALS)
-    .mergeMap(() => knowledgeBaseApi
-      .getCollection(store.getState().okapi)
-      .map(getKbCredentialsSuccess)
-      .catch(errors => Observable.of(getKbCredentialsFailure({ errors }))));
+    .pipe(
+      filter(action => action.type === GET_KB_CREDENTIALS),
+      mergeMap(() => knowledgeBaseApi
+        .getCollection(store.getState().okapi)
+        .pipe(
+          map(getKbCredentialsSuccess),
+          catchError(errors => of(getKbCredentialsFailure({ errors })))
+        )),
+    );
 };

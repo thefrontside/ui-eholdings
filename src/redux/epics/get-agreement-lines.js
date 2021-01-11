@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   UNASSIGN_AGREEMENT,
@@ -11,21 +14,23 @@ import {
 
 export default ({ agreementsApi }) => (action$, store) => {
   return action$
-    .filter(action => action.type === UNASSIGN_AGREEMENT)
-    .mergeMap(action => {
-      const { payload: { id: agreementId } } = action;
-      const {
-        okapi,
-        eholdings: { data: { agreements: { refId } } },
-      } = store.getState();
+    .pipe(
+      filter(action => action.type === UNASSIGN_AGREEMENT),
+      mergeMap(action => {
+        const { payload: { id: agreementId } } = action;
+        const {
+          okapi,
+          eholdings: { data: { agreements: { refId } } },
+        } = store.getState();
 
-      return agreementsApi
-        .getAgreementLines(okapi, agreementId, refId)
-        .map(agreementLines => {
-          const agreementLinesIds = agreementLines.map(({ id }) => id);
-
-          return getAgreementLinesSuccess(agreementLinesIds);
-        })
-        .catch(errors => Observable.of(getAgreementLinesFailure({ errors })));
-    });
+        return agreementsApi
+          .getAgreementLines(okapi, agreementId, refId).pipe(
+            map(agreementLines => {
+              const agreementLinesIds = agreementLines.map(({ id }) => id);
+              return getAgreementLinesSuccess(agreementLinesIds);
+            }),
+            catchError(errors => of(getAgreementLinesFailure({ errors }))),
+          );
+      }),
+    );
 };

@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   GET_USER_GROUPS,
@@ -10,10 +13,13 @@ import {
 } from '../actions';
 
 export default ({ userGroupsApi }) => (action$, store) => {
-  return action$
-    .filter(action => action.type === GET_USER_GROUPS)
-    .mergeMap(() => userGroupsApi
+  return action$.pipe(
+    filter(action => action.type === GET_USER_GROUPS),
+    mergeMap(() => userGroupsApi
       .getAll(store.getState().okapi)
-      .map(getUserGroupsSuccess)
-      .catch(errors => Observable.of(getUserGroupsFailure({ errors }))));
+      .pipe(
+        map(getUserGroupsSuccess),
+        catchError(errors => of(getUserGroupsFailure({ errors })))
+      ))
+  );
 };

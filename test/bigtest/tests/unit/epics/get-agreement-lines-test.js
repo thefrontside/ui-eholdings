@@ -1,6 +1,6 @@
 /* global describe, it, beforeEach */
 import { expect } from 'chai';
-import { TestScheduler } from 'rxjs/Rx';
+import { TestScheduler } from 'rxjs/testing';
 
 import { createGetAgreementLinesEpic } from '../../../../../src/redux/epics';
 import {

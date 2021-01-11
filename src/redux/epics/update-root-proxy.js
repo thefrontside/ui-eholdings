@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   UPDATE_ROOT_PROXY,
@@ -10,16 +13,19 @@ import {
 } from '../actions';
 
 export default ({ rootProxyApi }) => (action$, store) => {
-  return action$
-    .filter(action => action.type === UPDATE_ROOT_PROXY)
-    .mergeMap(action => {
+  return action$.pipe(
+    filter(action => action.type === UPDATE_ROOT_PROXY),
+    mergeMap(action => {
       const {
         payload: { rootProxy, credentialId },
       } = action;
 
       return rootProxyApi
         .updateRootProxy(store.getState().okapi, rootProxy, credentialId)
-        .map(() => updateRootProxySuccess(rootProxy))
-        .catch(errors => Observable.of(updateRootProxyFailure({ errors })));
-    });
+        .pipe(
+          map(() => updateRootProxySuccess(rootProxy)),
+          catchError(errors => of(updateRootProxyFailure({ errors })))
+        );
+    }),
+  );
 };

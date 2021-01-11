@@ -1,7 +1,7 @@
 /* global describe, it, beforeEach */
 import { expect } from 'chai';
 
-import { TestScheduler } from 'rxjs/Rx';
+import { TestScheduler } from 'rxjs/testing';
 
 import { createDeleteKbCredentialsUsersEpic } from '../../../../../src/redux/epics';
 import {

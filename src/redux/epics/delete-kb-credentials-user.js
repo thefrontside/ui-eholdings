@@ -1,7 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of } from 'rxjs';
+import {
+  mergeMap,
+  filter,
+  map,
+  catchError,
+} from 'rxjs/operators';
 
 import {
   DELETE_KB_CREDENTIALS_USER,
@@ -11,13 +14,17 @@ import {
 
 export default ({ kbCredentialsUsersApi }) => (action$, store) => {
   return action$
-    .filter(action => action.type === DELETE_KB_CREDENTIALS_USER)
-    .mergeMap(({ payload }) => {
-      const { credentialsId, userId } = payload;
+    .pipe(
+      filter(action => action.type === DELETE_KB_CREDENTIALS_USER),
+      mergeMap(({ payload }) => {
+        const { credentialsId, userId } = payload;
 
-      return kbCredentialsUsersApi
-        .unassignUser(store.getState().okapi, credentialsId, userId)
-        .map(() => deleteKBCredentialsUserSuccess(userId))
-        .catch(errors => Observable.of(deleteKBCredentialsUserFailure({ errors })));
-    });
+        return kbCredentialsUsersApi
+          .unassignUser(store.getState().okapi, credentialsId, userId)
+          .pipe(
+            map(() => deleteKBCredentialsUserSuccess(userId)),
+            catchError(errors => of(deleteKBCredentialsUserFailure({ errors }))),
+          );
+      }),
+    );
 };

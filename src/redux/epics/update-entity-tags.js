@@ -1,8 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { of, from } from 'rxjs';
+import {
+  mergeMap,
+  map,
+  catchError,
+} from 'rxjs/operators';
+import { ofType } from 'redux-observable';
 
 import { updateEntityTagsSuccess, updateEntityTagsFailure } from '../actions';
 import entityTagsActionTypes from '../constants/entityTagsActionTypes';
@@ -16,29 +18,33 @@ export default function updateEntityTags(action$, store) {
   const { getState } = store;
 
   return action$
-    .ofType(entityTagsActionTypes.UPDATE_ENTITY_TAGS)
-    .mergeMap(({ data, payload }) => {
-      const state = getState();
-      const url = `${state.okapi.url}/eholdings/${data.path}/tags`;
-      const method = 'PUT';
+    .pipe(
+      ofType(entityTagsActionTypes.UPDATE_ENTITY_TAGS),
+      mergeMap(({ data, payload }) => {
+        const state = getState();
+        const url = `${state.okapi.url}/eholdings/${data.path}/tags`;
+        const method = 'PUT';
 
-      // the request object created from this action
-      const request = state.eholdings.data[data.type].requests[data.timestamp];
+        // the request object created from this action
+        const request = state.eholdings.data[data.type].requests[data.timestamp];
 
-      const requestOptions = {
-        headers: getHeaders(method, state.okapi, url),
-        method,
-        body: JSON.stringify(payload),
-      };
+        const requestOptions = {
+          headers: getHeaders(method, state.okapi, url),
+          method,
+          body: JSON.stringify(payload),
+        };
 
-      const promise = fetch(url, requestOptions)
-        .then(response => Promise.all([response.ok, parseResponseBody(response)]))
-        .then(([ok, body]) => (ok ? body : Promise.reject(body)));
+        const promise = fetch(url, requestOptions)
+          .then(response => Promise.all([response.ok, parseResponseBody(response)]))
+          .then(([ok, body]) => (ok ? body : Promise.reject(body)));
 
-      return Observable.from(promise)
-        .map((response) => {
-          return updateEntityTagsSuccess(request, response, payload);
-        })
-        .catch(errors => Observable.of(updateEntityTagsFailure(request, errors, data)));
-    });
+        return from(promise)
+          .pipe(
+            map((response) => {
+              return updateEntityTagsSuccess(request, response, payload);
+            }),
+            catchError(errors => of(updateEntityTagsFailure(request, errors, data)))
+          );
+      }),
+    );
 }
