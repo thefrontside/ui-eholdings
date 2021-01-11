@@ -29,8 +29,8 @@ export default ({ agreementsApi }) => (action$, store) => {
           items,
         };
 
-        return agreementsApi
-          .deleteAgreementLines(okapi, agreement).pipe(
+        return agreementsApi.deleteAgreementLines(okapi, agreement)
+          .pipe(
             map(() => deleteAgreementLinesSuccess()),
             catchError(errors => of(deleteAgreementLinesFailure({ errors }))),
           );
