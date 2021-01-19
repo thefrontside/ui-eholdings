@@ -145,6 +145,8 @@ class SearchRoute extends Component {
     }
   }
 
+  $resultPaneTitle = React.createRef();
+
   toggleFilter = filterName => () => {
     const filterToBeToggled = filterName === 'access-type'
       ? 'searchByAccessTypesEnabled'
@@ -337,6 +339,7 @@ class SearchRoute extends Component {
         tags: undefined
       }
     }), this.handleSearch);
+    this.$resultPaneTitle.current.focus();
   };
 
   /**
@@ -461,6 +464,7 @@ class SearchRoute extends Component {
                 resultsType={searchType}
                 resultsLabel={label}
                 resultsView={this.renderResults()}
+                resultPaneTitle={this.$resultPaneTitle}
                 totalResults={results.length}
                 isLoading={!results.hasLoaded}
                 updateFilters={this.updateFilters}

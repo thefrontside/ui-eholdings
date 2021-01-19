@@ -76,7 +76,7 @@ class ResourceShow extends Component {
         resourceShowInformation: true,
         resourceShowCustomLabels: true,
         resourceShowSettings: true,
-        resourceShowCoverageSettings: this.props.model.isSelected,
+        resourceShowCoverageSettings: true,
         resourceShowAgreements: true,
         resourceShowNotes: true,
       },

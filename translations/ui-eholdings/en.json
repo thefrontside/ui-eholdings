@@ -449,5 +449,6 @@
     "permission.settings.access-types.create-edit": "Settings (eholdings): Can create, edit, and view access status types",
     "permission.settings.access-types.view": "Settings (eholdings): Can view access status types",
     "permission.settings.custom-labels.all": "Settings (eholdings): Can create, edit, view, and delete custom labels",
-    "permission.settings.custom-labels.view": "Settings (eholdings): Can view custom labels"
+    "permission.settings.custom-labels.view": "Settings (eholdings): Can view custom labels",
+    "permission.settings.assignedUser": "Settings (eHoldings): Can assign/unassign a user from a KB"
   }
